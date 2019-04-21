@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xbhou.learn.bean.mapper.EmployeeMapper">
+	<resultMap type="employee" id="employeeMapper">
+		<id column="id" property="id" />
+		<result column="real_name" property="realName" />
+		<result column="sex" property="sex"
+			typeHandler="cn.xbhou.learn.typehandler.MySexEnumTypeHandler" />
+		<association property="workCard" column="id" fetchType="eager"
+			select="cn.xbhou.learn.bean.mapper.WorkCardMapper.getWorkCard">
+		</association>
+		<collection property="employeeTasks" column="id"
+			select="cn.xbhou.learn.bean.mapper.EmployeeTaskMapper.getTaskForEmployee"></collection>
+		<discriminator javaType="_int" column="sex">
+			<case value="1" resultMap="maleEmployeeMapper" />
+			<case value="0" resultMap="femaleEmployeeMapper" />
+		</discriminator>
+	</resultMap>
+	<resultMap type="maleEmployee" id="maleEmployeeMapper"
+		extends="employeeMapper">
+		<association property="healthInfo" column="id"
+			select="cn.xbhou.learn.bean.mapper.MaleHealthMapper.getMaleHealthInfoByEmpId"></association>
+	</resultMap>
+	<resultMap type="femaleEmployee" id="femaleEmployeeMapper"
+		extends="employeeMapper">
+		<association property="healthInfo" column="id"
+			select="cn.xbhou.learn.bean.mapper.FemaleHealthMapper.getFemaleHealthInfoByEmpId"></association>
+	</resultMap>
+	<select id="getEmployee" parameterType="long"
+		resultMap="employeeMapper">
+		select * from t_employee t where t.id=#{id}
+	</select>
+</mapper>	
